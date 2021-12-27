@@ -1,15 +1,15 @@
 <!--
  * @Author: han wu 
  * @Date: 2021-12-25 23:18:22
- * @LastEditTime: 2021-12-25 23:18:22
+ * @LastEditTime: 2021-12-27 08:58:24
  * @LastEditors: your name
  * @Description: 
- * @FilePath: /BlueBlog_Demo/blueblog/templates/blog/_posts.html
+ * @FilePath: \BlueBlog_Demo\blueblog\templates\blog\_posts.html
  * ~~~~~~~~~吼吼吼~~~~~~~~~~
 -->
 {% if posts %}
     {% for post in posts %}
-        <h3 class="text-primary"><a href="{{ url_for('.show_post', post_id=post.id) }}">{{ post.title }}</a></h3>
+        <h3 class="text-primary"><a href="{{ url_for('blog.show_post', post_id=post.id) }}">{{ post.title }}</a></h3>
         <p>
             {{ post.body|striptags|truncate }}
             <small><a href="{{ url_for('.show_post', post_id=post.id) }}">Read More</a></small>
