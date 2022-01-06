@@ -21,7 +21,7 @@ faker = Faker()
 def fake_admin():
     admin = Admin(
 		username = 'admin',
-		blog_title = 'Blurblog',
+		blog_title = 'Blueblog',
 		blog_sub_title = 'No, I\'m the real thing.',
 		name = "Mima kirigoe",
 		about = "Um, I, Mima Kirigor, had a fun time as a member of CHAM..."

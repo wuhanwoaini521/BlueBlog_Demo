@@ -1,7 +1,7 @@
 '''
 Author: han wu 
 Date: 2021-12-23 09:37:27
-LastEditTime: 2021-12-26 16:28:38
+LastEditTime: 2022-01-02 10:26:55
 LastEditors: your name
 Description: 
 FilePath: /BlueBlog_Demo/blueblog/__init__.py
@@ -19,10 +19,11 @@ from flask_sqlalchemy import get_debug_queries
 from flask_wtf.csrf import CSRFError
 
 from blueblog.settings import config
-from blueblog.extensions import bootstrap, db, ckeditor, mail, moment
+from blueblog.extensions import bootstrap, db, ckeditor, mail, moment, login_manager,csrf
 from blueblog.blueprints.admin import admin_bp
 from blueblog.blueprints.auth import auth_bp
 from blueblog.blueprints.blog import blog_bp
+from blueblog.models import Admin, Post, Category, Comment
 
 # from blueblog.commands import register_commands
 
@@ -37,6 +38,7 @@ def create_app(config_name = None): # 配置FLASK_APP应用后，会自动检测
         
     app = Flask('blueblog')
     app.config.from_object(config[config_name])
+    app.secret_key = 'xxxxyyyyyzzzzz'
     
     register_logging(app) # 注册日志处理器
     register_extensions(app) # 注册扩展（扩展初始化）
@@ -56,7 +58,9 @@ def register_extensions(app):
     db.init_app(app)
     ckeditor.init_app(app)
     mail.init_app(app)
+    login_manager.init_app(app)
     moment.init_app(app)
+    csrf.init_app(app)
 
 def register_blueprints(app):
     app.register_blueprint(blog_bp)
@@ -67,15 +71,22 @@ def register_blueprints(app):
 def register_shell_context(app):
     @app.shell_context_processor # 上下文处理器，返回字典中的键可以在模板上下文中使用
     def make_shell_context():
-        return dict(db=db)
+        return dict(db=db, Admin = Admin, Post = Post, Category = Category, Comment = Comment)
     
 # 注册模板上下文处理函数
-def register_template_context(app): # 模板上下文
+def register_template_context(app):
     @app.context_processor
     def make_template_context():
         admin = Admin.query.first()
         categories = Category.query.order_by(Category.name).all()
-        return dict(admin= admin, categories= categories)
+        # links = Link.query.order_by(Link.name).all()
+        if current_user.is_authenticated:
+            unread_comments = Comment.query.filter_by(reviewed=False).count()
+        else:
+            unread_comments = None
+        return dict(
+            admin=admin, categories=categories,
+            unread_comments=unread_comments)
 
 # 注册错误处理函数
 def register_errors(app):

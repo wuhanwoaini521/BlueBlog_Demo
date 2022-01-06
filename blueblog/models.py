@@ -1,7 +1,7 @@
 '''
 Author: han wu 
 Date: 2021-12-23 09:37:37
-LastEditTime: 2021-12-25 22:52:49
+LastEditTime: 2022-01-02 10:40:09
 LastEditors: your name
 Description: 
 FilePath: /BlueBlog_Demo/blueblog/models.py
@@ -10,12 +10,13 @@ FilePath: /BlueBlog_Demo/blueblog/models.py
 from sqlalchemy.orm import backref
 from blueblog.extensions import db
 from datetime import datetime
+from flask_login import UserMixin
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
 # 管理员模型
-class Admin(db.Model):
+class Admin(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True) # 主键
     username = db.Column(db.String(20)) 
     password_hash = db.Column(db.String(128)) # 密码散列值
@@ -44,6 +45,7 @@ class Post(db.Model):
     title = db.Column(db.String(60))
     body = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    can_comment = db.Column(db.Boolean, default=True)
     
     # 一对多关系，一个分类下面有多个文章
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))

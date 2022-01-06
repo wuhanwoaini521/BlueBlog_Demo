@@ -1,7 +1,7 @@
 '''
 Author: han wu 
 Date: 2021-12-23 09:37:32
-LastEditTime: 2021-12-25 21:41:45
+LastEditTime: 2022-01-02 10:24:52
 LastEditors: your name
 Description:  表单
 FilePath: /BlueBlog_Demo/blueblog/forms.py
@@ -58,3 +58,16 @@ class AdminCommentForm(FlaskForm):
     author = HiddenField()
     email = HiddenField()
     site = HiddenField()
+    
+class SettingForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(1, 30)])
+    blog_title = StringField('Blog Title', validators=[DataRequired(), Length(1, 60)])
+    blog_sub_title = StringField('Blog Sub Title', validators=[DataRequired(), Length(1, 100)])
+    about = CKEditorField('About Page', validators=[DataRequired()])
+    submit = SubmitField()
+    
+
+class LinkForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(1, 30)])
+    url = StringField('URL', validators=[DataRequired(), URL(), Length(1, 255)])
+    submit = SubmitField()

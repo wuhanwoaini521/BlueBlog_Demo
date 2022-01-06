@@ -1,22 +1,47 @@
 '''
 Author: han wu 
 Date: 2021-12-23 09:36:20
-LastEditTime: 2021-12-25 21:47:29
+LastEditTime: 2022-01-02 10:11:05
 LastEditors: your name
 Description: 
 FilePath: /BlueBlog_Demo/blueblog/blueprints/auth.py
 ~~~~~~~~~吼吼吼~~~~~~~~~~
 '''
 from flask import render_template, flash, redirect, url_for, Blueprint
+from flask_login import login_user, logout_user, login_required, current_user
 
-auth_bp = Blueprint(
-	"auth", __name__
-)
+from blueblog.forms import LoginForm
+from blueblog.models import Admin
+from blueblog.utils import redirect_back
 
-@auth_bp.route("/login", methods=["GET", "POST"])
+auth_bp = Blueprint('auth', __name__)
+
+
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('auth/login.html')
+    if current_user.is_authenticated:
+        return redirect(url_for('blog.index'))
 
-@auth_bp.route("/logout")
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        remember = form.remember.data
+        admin = Admin.query.first()
+        if admin:
+            if username == admin.username and admin.validate_password(password):
+                login_user(admin, remember)
+                flash('Welcome back.', 'info')
+                return redirect_back()
+            flash('Invalid username or password.', 'warning')
+        else:
+            flash('No account.', 'warning')
+    return render_template('auth/login.html', form=form)
+
+
+@auth_bp.route('/logout')
+@login_required
 def logout():
-    return render_template('auth/logout.html')
+    logout_user()
+    flash('Logout success.', 'info')
+    return redirect_back()
